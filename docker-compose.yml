@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  spring-kubernetes-deployment:
+    image: fyuizee/spring-kubernetes-deployment
+#    image: spring-kubernetes-deployment
+    container_name: spring-kubernetes-deployment
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+
+  mongodb-deployment:
+    container_name: mongodb-deployment
+    image: mongo:7.0-jammy
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: test

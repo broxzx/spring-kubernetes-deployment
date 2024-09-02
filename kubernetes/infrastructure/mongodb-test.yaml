@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongodb-test
+  name: mongodb-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-test
+  template:
+    metadata:
+      labels:
+        app: mongodb-test
+    spec:
+      containers:
+        - image: mongo:7.0-jammy
+          name: mongodb-test
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: "test"
+          resources: { }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongodb-test
+  name: mongodb-test
+spec:
+  ports:
+    - port: 27017
+      protocol: TCP
+      targetPort: 27017
+  selector:
+    app: mongodb-test
+  type: ClusterIP
