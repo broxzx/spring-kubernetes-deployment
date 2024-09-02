@@ -21,8 +21,18 @@ spec:
             - containerPort: 27017
           env:
             - name: MONGO_INITDB_DATABASE
-              value: "test"
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: mongo_initdb_database
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongodb-data
           resources: { }
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: mongodb-test-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -38,3 +48,35 @@ spec:
   selector:
     app: mongodb-test
   type: ClusterIP
+---
+apiVersion: v1
+data:
+  mongo_initdb_database: dGVzdA==
+kind: Secret
+metadata:
+  name: mongodb-secrets
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-test-pv
+spec:
+  storageClassName: 'standard'
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /data/db
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-test-pvc
+spec:
+  storageClassName: 'standard'
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
